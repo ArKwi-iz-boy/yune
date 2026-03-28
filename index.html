@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Yune</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #1a0105; /* Deep dark pink/black */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Great+Vibes', cursive;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .message-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        h1,h2 {
+            font-size: 5rem;
+            color: #ff85a1;
+            text-shadow: 0 0 20px #ff0055, 0 0 40px #ff0055;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        
+        @keyframes glow {
+            from { transform: scale(1); text-shadow: 0 0 20px #ff0055; }
+            to { transform: scale(1.05); text-shadow: 0 0 40px #ff0055, 0 0 60px #ffb3c1; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="message-container">
+        <h1>You are my love, Yune</h1>
+        <h2>Be mine Forever</h2>
+        <img src="img.jpg" width="400" height="200">
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        const colors = ['#ff0055', '#ff85a1', '#fbb1bd', '#ffb3c1', '#ffffff'];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, color, type) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.type = type; // 'heart' or 'spark'
+                this.size = type === 'heart' ? Math.random() * 15 + 5 : Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 8;
+                this.speedY = (Math.random() - 0.5) * 8;
+                this.gravity = 0.05;
+                this.opacity = 1;
+                this.life = 1;
+                this.decay = Math.random() * 0.02 + 0.01;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                
+                if (this.type === 'heart') {
+                    // Drawing a heart shape
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.bezierCurveTo(this.x, this.y - 3, this.x - 5, this.y - 15, this.x - 25, this.y - 15);
+                    ctx.bezierCurveTo(this.x - 55, this.y - 15, this.x - 55, this.y + 22.5, this.x - 55, this.y + 22.5);
+                    ctx.bezierCurveTo(this.x - 55, this.y + 40, this.x - 35, this.y + 62, this.x, this.y + 80);
+                    ctx.bezierCurveTo(this.x + 35, this.y + 62, this.x + 55, this.y + 40, this.x + 55, this.y + 22.5);
+                    ctx.bezierCurveTo(this.x + 55, this.y + 22.5, this.x + 55, this.y - 15, this.x + 25, this.y - 15);
+                    ctx.bezierCurveTo(this.x + 10, this.y - 15, this.x, this.y - 3, this.x, this.y);
+                    ctx.fill();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            update() {
+                this.speedY += this.gravity;
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.opacity -= this.decay;
+            }
+        }
+
+        function createFirework() {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height * 0.5;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const isHeartBurst = Math.random() > 0.5;
+
+            for (let i = 0; i < 30; i++) {
+                particles.push(new Particle(x, y, color, isHeartBurst ? 'heart' : 'spark'));
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(26, 1, 5, 0.2)'; // Trail effect
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (Math.random() < 0.05) createFirework();
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].opacity <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
