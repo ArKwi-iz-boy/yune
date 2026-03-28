@@ -2,147 +2,219 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For Yune</title>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape">
+    <title>For My Dearest Yune</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-pink: #ff85a1;
+            --deep-rose: #ff0055;
+            --gold: #ffd700;
+        }
+
         body {
             margin: 0;
+            padding: 0;
             overflow: hidden;
-            background: #1a0105; /* Deep dark pink/black */
+            background: #0a0104; 
+            height: 100vh;
+            width: 100vw;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            font-family: 'Great+Vibes', cursive;
+            font-family: 'Great Vibes', cursive;
         }
 
-        #canvas {
+        canvas {
             position: absolute;
             top: 0;
             left: 0;
+            z-index: 1;
         }
 
-        .message-container {
+        .container {
             position: relative;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            width: 90%;
             z-index: 10;
+            pointer-events: none; 
+        }
+
+        .text-box {
+            text-align: left;
+            flex: 1.2;
+            background: rgba(26, 1, 5, 0.4);
+            padding: 30px;
+            border-radius: 30px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 133, 161, 0.3);
+        }
+
+        .qr-container {
+            flex: 0.8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto; /* Allows clicking the QR code if needed */
+        }
+
+        .qr-image {
+            width: 280px; /* Adjust size for mobile landscape */
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 0 25px var(--deep-rose);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: var(--primary-pink);
+            margin: 0;
+            text-shadow: 0 0 15px var(--deep-rose), 0 0 30px var(--deep-rose);
+        }
+
+        .fancy-words {
+            font-family: 'Dancing Script', cursive;
+            color: #fff;
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin-top: 15px;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+        }
+
+        .sticker {
+            position: absolute;
+            font-size: 2.5rem;
+            z-index: 5;
+            animation: drift var(--d) linear infinite;
+        }
+
+        @keyframes drift {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+        }
+
+        @media screen and (orientation: portrait) {
+            #landscape-warning { display: flex; }
+        }
+
+        #landscape-warning {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #1a0105;
+            z-index: 999;
+            color: white;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            pointer-events: none;
-        }
-
-        h1,h2 {
-            font-size: 5rem;
-            color: #ff85a1;
-            text-shadow: 0 0 20px #ff0055, 0 0 40px #ff0055;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        
-        @keyframes glow {
-            from { transform: scale(1); text-shadow: 0 0 20px #ff0055; }
-            to { transform: scale(1.05); text-shadow: 0 0 40px #ff0055, 0 0 60px #ffb3c1; }
+            padding: 20px;
         }
     </style>
 </head>
 <body>
 
+    <div id="landscape-warning">💖 Please rotate your phone to Landscape mode for Yune 🔄</div>
+
     <canvas id="canvas"></canvas>
 
-    <div class="message-container">
-        <h1>You are my love, Yune</h1>
-        <h2>Be mine Forever</h2>
-        <img src="img.jpg" width="400" height="200">
+    <div class="container">
+        <div class="text-box">
+            <h1>You are my love, Yune</h1>
+            <div class="fancy-words">
+                You are the sparkle in my eyes and the beat in my heart.<br>
+                May our love shine brighter than the stars tonight.<br>
+                ✨ Forever & Always Yours ✨
+            </div>
+        </div>
+
+        <div class="qr-container">
+            <img src="img.jpg" alt="QR Code for Yune" class="qr-image">
+        </div>
     </div>
 
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-
         let particles = [];
-        const colors = ['#ff0055', '#ff85a1', '#fbb1bd', '#ffb3c1', '#ffffff'];
 
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-
         window.addEventListener('resize', resize);
         resize();
 
-        class Particle {
-            constructor(x, y, color, type) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.type = type; // 'heart' or 'spark'
-                this.size = type === 'heart' ? Math.random() * 15 + 5 : Math.random() * 3 + 1;
-                this.speedX = (Math.random() - 0.5) * 8;
-                this.speedY = (Math.random() - 0.5) * 8;
-                this.gravity = 0.05;
+        class FireworkParticle {
+            constructor(x, y, color) {
+                this.x = x; this.y = y; this.color = color;
+                this.radius = Math.random() * 2 + 1;
+                this.velocity = { x: (Math.random() - 0.5) * 12, y: (Math.random() - 0.5) * 12 };
                 this.opacity = 1;
-                this.life = 1;
-                this.decay = Math.random() * 0.02 + 0.01;
+                this.friction = 0.96;
+                this.gravity = 0.15;
             }
-
             draw() {
                 ctx.save();
                 ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                 ctx.fillStyle = this.color;
-                
-                if (this.type === 'heart') {
-                    // Drawing a heart shape
-                    ctx.beginPath();
-                    ctx.moveTo(this.x, this.y);
-                    ctx.bezierCurveTo(this.x, this.y - 3, this.x - 5, this.y - 15, this.x - 25, this.y - 15);
-                    ctx.bezierCurveTo(this.x - 55, this.y - 15, this.x - 55, this.y + 22.5, this.x - 55, this.y + 22.5);
-                    ctx.bezierCurveTo(this.x - 55, this.y + 40, this.x - 35, this.y + 62, this.x, this.y + 80);
-                    ctx.bezierCurveTo(this.x + 35, this.y + 62, this.x + 55, this.y + 40, this.x + 55, this.y + 22.5);
-                    ctx.bezierCurveTo(this.x + 55, this.y + 22.5, this.x + 55, this.y - 15, this.x + 25, this.y - 15);
-                    ctx.bezierCurveTo(this.x + 10, this.y - 15, this.x, this.y - 3, this.x, this.y);
-                    ctx.fill();
-                } else {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
                 ctx.restore();
             }
-
             update() {
-                this.speedY += this.gravity;
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.opacity -= this.decay;
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.opacity -= 0.012;
             }
         }
 
-        function createFirework() {
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height * 0.5;
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            const isHeartBurst = Math.random() > 0.5;
-
-            for (let i = 0; i < 30; i++) {
-                particles.push(new Particle(x, y, color, isHeartBurst ? 'heart' : 'spark'));
+        function createExplosion(x, y) {
+            const hue = Math.random() * 60 + 320; 
+            for (let i = 0; i < 50; i++) {
+                particles.push(new FireworkParticle(x, y, `hsla(${hue}, 100%, 70%, 1)`));
             }
+        }
+
+        const icons = ['🌸', '💖', '🧸', '🎀', '💎', '🍭'];
+        for (let i = 0; i < 15; i++) {
+            let s = document.createElement('div');
+            s.className = 'sticker';
+            s.innerText = icons[Math.floor(Math.random() * icons.length)];
+            s.style.left = Math.random() * 100 + 'vw';
+            s.style.setProperty('--d', (Math.random() * 8 + 6) + 's');
+            s.style.animationDelay = (Math.random() * 10) + 's';
+            document.body.appendChild(s);
         }
 
         function animate() {
-            ctx.fillStyle = 'rgba(26, 1, 5, 0.2)'; // Trail effect
+            ctx.fillStyle = 'rgba(10, 1, 4, 0.2)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            if (Math.random() < 0.05) createFirework();
-
-            for (let i = particles.length - 1; i >= 0; i--) {
-                particles[i].update();
-                particles[i].draw();
-                if (particles[i].opacity <= 0) {
-                    particles.splice(i, 1);
-                }
-            }
+            if (Math.random() < 0.05) createExplosion(Math.random() * canvas.width, Math.random() * canvas.height * 0.7);
+            particles.forEach((p, i) => {
+                if (p.opacity > 0) { p.update(); p.draw(); }
+                else { particles.splice(i, 1); }
+            });
             requestAnimationFrame(animate);
         }
 
+        window.addEventListener('mousedown', (e) => createExplosion(e.clientX, e.clientY));
         animate();
     </script>
 </body>
